@@ -1,50 +1,22 @@
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux';
-import { addCartItem } from './reduxToolkit/CartSlice';
+import { addProductToMyCart, subtrProductToMyCart } from './reduxToolkit/CartSlice';
+import { decreaseQty, increaseQty, removeCartItem } from './reduxToolkit/MyProductSlice';
+
 
 const HomeScreen = ({ navigation }) => {
 
-    const items = [
-        {
-            id: 1,
-            name: 'Synthetic Leather |Lightweight|Comfort|Summer|',
-            brand: 'PUMA',
-            price: 10.99,
-            image: 'https://rukminim2.flixcart.com/image/832/832/l51d30w0/shoe/z/w/c/10-mrj1914-10-aadi-white-black-red-original-imagft9k9hydnfjp.jpeg?q=70',
-            qty: 10
-        },
-        {
-            id: 2,
-            name: 'MAX Sports shoes, Running, Walking, Lightweight, Gym',
-            brand: 'NIKE',
-            price: 15.99,
-            image: 'https://rukminim2.flixcart.com/image/416/416/xif0q/shoe/4/p/4/-original-imagpzm9apyqghyx.jpeg?q=70',
-            qty: 12
-        },
-        {
-            id: 3,
-            name: 'VENTADOR CLIMACOOL Running Shoes For Men  (Blue)',
-            brand: 'Adidas',
-            price: 18.55,
-            image: 'https://rukminim2.flixcart.com/image/832/832/xif0q/shoe/s/w/l/-original-imagngfvf98j2gpk.jpeg?q=70',
-            qty: 15
-        },
-        {
-            id: 4,
-            name: 'SM-678 Running Shoes For Men  (Blue, Green)',
-            brand: 'Sparx',
-            price: 10.15,
-            image: 'https://rukminim2.flixcart.com/image/832/832/xif0q/shoe/k/w/w/-original-imagrnddgwysrka2.jpeg?q=70',
-            qty: 25
-        },
-    ];
-
+    const myProducts = useSelector(state => state.product)
+    const myCartItems = useSelector(state => state.cart)
 
     const dispatch = useDispatch()
-    const addedItems = useSelector(state => state.cart)
-    console.log("addedItems", addedItems)
-    const addItem = (item) => {
-        dispatch(addCartItem(item))
+
+    const getTotal = () => {
+        let total = 0;
+        myCartItems.map(item => {
+            total = total + item.qty * item.price
+        })
+        return total
     }
 
     return (
@@ -54,14 +26,14 @@ const HomeScreen = ({ navigation }) => {
                     <Text style={[styles.textFont, { fontSize: 14, textTransform: "capitalize", fontWeight: "bold", marginLeft: 0 }]}>HomeScreen</Text>
 
                 </View>
-                <View style={{ justifyContent: "center", alignItems: "center", marginTop: 5, marginHorizontal: 30, backgroundColor: "#b8d8a0", borderRadius: 30 }}>
-                    <Text style={{ color: '#000', textAlign: "center", fontSize: 14, padding: 5, paddingHorizontal: 30, fontWeight: "bold" }}>{addedItems.length}</Text>
-                </View>
+                <TouchableOpacity onPress={() => navigation.navigate("CartScreen")} style={{ justifyContent: "center", alignItems: "center", marginTop: 5, marginHorizontal: 30, backgroundColor: "#b8d8a0", borderRadius: 30 }}>
+                    <Text style={{ color: '#000', textAlign: "center", fontSize: 14, padding: 5, paddingHorizontal: 30, fontWeight: "bold" }}>{myCartItems.length}</Text>
+                </TouchableOpacity>
             </View>
             <ScrollView style={styles.container}>
                 <View style={{ marginTop: 10, marginHorizontal: 15 }}>
                     {
-                        items.map((item) => (
+                        myProducts.map((item) => (
                             <View style={styles.listItem} key={item.id}>
 
                                 <View style={{ flex: 1, flexDirection: "row", marginHorizontal: 8 }}>
@@ -79,24 +51,31 @@ const HomeScreen = ({ navigation }) => {
                                         </View>
                                     </View>
                                     <View style={{ flex: 1.5, justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
-                                        {/* {item.qty == 0 ? */}
-                                        <TouchableOpacity onPress={() => { addItem(item) }} style={[styles.loginButton, { paddingHorizontal: 10, paddingVertical: 5 }]}>
-                                            <Text style={{ color: 'white', textAlign: "center", fontSize: 12 }}>Add to Cart</Text>
-                                        </TouchableOpacity>
-                                        {/* // : null} */}
-                                        {/* {item.qty == 0 ? null :
-                                            <TouchableOpacity style={styles.loginButton}>
+                                        {item.qty == 0 ?
+                                            <TouchableOpacity onPress={() => { dispatch(addProductToMyCart(item)), dispatch(increaseQty(item.id)) }} style={[styles.loginButton, { paddingHorizontal: 10, paddingVertical: 5 }]}>
+                                                <Text style={{ color: 'white', textAlign: "center", fontSize: 12 }}>Add to Cart</Text>
+                                            </TouchableOpacity>
+                                            : null}
+                                        {item.qty == 0 ? null :
+                                            <TouchableOpacity onPress={() => {
+                                                if (item.qty > 1) {
+                                                    dispatch(subtrProductToMyCart(item))
+                                                    dispatch(decreaseQty(item.id))
+                                                } else {
+                                                    dispatch(decreaseQty(item.id))
+                                                }
+                                            }} style={styles.loginButton}>
                                                 <Text style={{ color: 'white', textAlign: "center", fontSize: 12 }}>-</Text>
                                             </TouchableOpacity>
                                         }
                                         {item.qty == 0 ? null :
-                                            <Text style={[styles.textFont, { fontSize: 12, fontWeight: "bold", marginHorizontal: 10 }]}>1</Text>
+                                            <Text style={[styles.textFont, { fontSize: 12, fontWeight: "bold", marginHorizontal: 10 }]}>{item.qty}</Text>
                                         }
                                         {item.qty == 0 ? null :
-                                            <TouchableOpacity style={styles.loginButton}>
+                                            <TouchableOpacity onPress={() => { dispatch(addProductToMyCart(item)), dispatch(increaseQty(item.id)) }} style={styles.loginButton}>
                                                 <Text style={{ color: 'white', textAlign: "center", fontSize: 12 }}>+</Text>
                                             </TouchableOpacity>
-                                        } */}
+                                        }
                                     </View>
                                 </View>
 
@@ -104,17 +83,24 @@ const HomeScreen = ({ navigation }) => {
                         ))}
                 </View>
             </ScrollView>
-            <View style={{ height: 70, justifyContent: "space-between", alignItems: "center", backgroundColor: "white", flexDirection: "row" }}>
-                <View style={{ justifyContent: "center", alignItems: "center", marginTop: 5, marginHorizontal: 30 }}>
-                    <Text style={[styles.textFont, { fontSize: 14, textTransform: "capitalize", fontWeight: "bold", marginLeft: 0 }]}>items added (1)</Text>
-                    <Text style={[styles.textFont, { fontSize: 14, fontWeight: "normal", marginLeft: 0 }]}>$ 49.16</Text>
-                </View>
-                <View style={{ justifyContent: "center", alignItems: "center", marginTop: 5, marginHorizontal: 30 }}>
-                    <TouchableOpacity style={[styles.loginButton, { paddingHorizontal: 20, paddingVertical: 7 }]} onPress={() => navigation.navigate("CartScreen")}>
-                        <Text style={{ color: 'white', textAlign: "center", fontSize: 14 }}>View Cart</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
+
+            {
+                myCartItems.length > 0 ? (
+                    <View style={{ height: 70, justifyContent: "space-between", alignItems: "center", backgroundColor: "white", flexDirection: "row" }}>
+                        <View style={{ justifyContent: "center", alignItems: "center", marginTop: 5, marginHorizontal: 30 }}>
+                            <Text style={[styles.textFont, { fontSize: 14, textTransform: "capitalize", fontWeight: "bold", marginLeft: 0 }]}>{'items added' + '(' + myCartItems.length + ')'}</Text>
+                            <Text style={[styles.textFont, { fontSize: 14, fontWeight: "normal", marginLeft: 0 }]}>{'Total: ' + '$ ' + Math.round(getTotal() * 100) / 100}</Text>
+                        </View>
+                        <View style={{ justifyContent: "center", alignItems: "center", marginTop: 5, marginHorizontal: 30 }}>
+                            <TouchableOpacity style={[styles.loginButton, { paddingHorizontal: 20, paddingVertical: 7 }]} onPress={() => navigation.navigate("CartScreen")}>
+                                <Text style={{ color: 'white', textAlign: "center", fontSize: 14 }}>View Cart</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                ) : null
+            }
+
 
         </View>
     )

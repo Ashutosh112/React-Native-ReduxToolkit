@@ -1,16 +1,13 @@
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux';
-import { removeCartItem } from './reduxToolkit/CartSlice';
-import { useState } from 'react';
+import { addProductToMyCart, removeCartItem, subtrProductToMyCart } from './reduxToolkit/CartSlice';
+import { decreaseQty, increaseQty } from './reduxToolkit/MyProductSlice';
+
 
 const CartScreen = ({ navigation }) => {
 
+    const myCartItems = useSelector(state => state.cart)
     const dispatch = useDispatch()
-    const items = useSelector(state => state.cart)
-    console.log("items", items)
-    const removeItemm = (index) => {
-        dispatch(removeCartItem(index))
-    }
 
     return (
         <View style={{ flex: 1 }}>
@@ -24,7 +21,7 @@ const CartScreen = ({ navigation }) => {
             <ScrollView style={styles.container}>
                 <View style={{ marginTop: 10, marginHorizontal: 15 }}>
                     {
-                        items.map((item) => (
+                        myCartItems.map((item) => (
                             <View style={styles.listItem} key={item.id}>
 
                                 <View style={{ flex: 1, flexDirection: "row", marginHorizontal: 8 }}>
@@ -42,24 +39,33 @@ const CartScreen = ({ navigation }) => {
                                         </View>
                                     </View>
                                     <View style={{ flex: 1.5, justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
-                                        {/* {item.qty == 0 ? */}
-                                        <TouchableOpacity onPress={() => removeItemm(item.id)} style={[styles.loginButton, { paddingHorizontal: 10, paddingVertical: 5, backgroundColor: "red", borderColor: "red" }]}>
-                                            <Text style={{ color: 'white', textAlign: "center", fontSize: 12, fontWeight: "bold" }}>Remove</Text>
-                                        </TouchableOpacity>
-                                        {/* : null} */}
-                                        {/* {item.qty == 0 ? null :
-                                            <TouchableOpacity style={styles.loginButton}>
+                                        {/* {item.qty == 0 ?
+                                            <TouchableOpacity style={[styles.loginButton, { paddingHorizontal: 10, paddingVertical: 5, backgroundColor: "red", borderColor: "red" }]}>
+                                                <Text style={{ color: 'white', textAlign: "center", fontSize: 12, fontWeight: "bold" }}>Remove</Text>
+                                            </TouchableOpacity>
+                                            : null} */}
+                                        {item.qty == 0 ? null :
+                                            <TouchableOpacity onPress={() => {
+                                                if (item.qty > 1) {
+                                                    dispatch(subtrProductToMyCart(item))
+                                                    dispatch(decreaseQty(item.id))
+                                                } else {
+                                                    dispatch(removeCartItem(item.id))
+                                                    dispatch(decreaseQty(item.id))
+                                                }
+                                            }}
+                                                style={styles.loginButton}>
                                                 <Text style={{ color: 'white', textAlign: "center", fontSize: 12 }}>-</Text>
                                             </TouchableOpacity>
                                         }
                                         {item.qty == 0 ? null :
-                                            <Text style={[styles.textFont, { fontSize: 12, fontWeight: "bold", marginHorizontal: 10 }]}>1</Text>
+                                            <Text style={[styles.textFont, { fontSize: 12, fontWeight: "bold", marginHorizontal: 10 }]}>{item.qty}</Text>
                                         }
                                         {item.qty == 0 ? null :
-                                            <TouchableOpacity style={styles.loginButton}>
+                                            <TouchableOpacity onPress={() => { dispatch(addProductToMyCart(item)), dispatch(increaseQty(item.id)) }} style={styles.loginButton}>
                                                 <Text style={{ color: 'white', textAlign: "center", fontSize: 12 }}>+</Text>
                                             </TouchableOpacity>
-                                        } */}
+                                        }
                                     </View>
                                 </View>
 

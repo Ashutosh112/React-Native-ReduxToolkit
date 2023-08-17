@@ -1,33 +1,29 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const CartSlice = createSlice({
-    name: "cart",
+const MyProductSlice = createSlice({
+    name: "product",
     initialState: [],
     reducers: {
-        addProductToMyCart(state, action) {
+        addMyProducts(state, action) {
+            state.push(action.payload)
+        },
+        increaseQty(state, action) {
             let myIndex = -1;
             state.map((item, index) => {
-                if (item.id == action.payload.id) {
+                if (item.id == action.payload) {
                     myIndex = index;
                 }
             })
             if (myIndex == -1) {
-                state.push({
-                    id: action.payload.id,
-                    name: action.payload.name,
-                    brand: action.payload.brand,
-                    price: action.payload.price,
-                    image: action.payload.image,
-                    qty: action.payload.qty + 1
-                })
+
             } else {
                 state[myIndex].qty = state[myIndex].qty + 1;
             }
         },
-        subtrProductToMyCart(state, action) {
+        decreaseQty(state, action) {
             let myIndex = -1;
             state.map((item, index) => {
-                if (item.id == action.payload.id) {
+                if (item.id == action.payload) {
                     myIndex = index;
                 }
             })
@@ -43,5 +39,5 @@ const CartSlice = createSlice({
     }
 })
 
-export const { addProductToMyCart, subtrProductToMyCart, removeCartItem } = CartSlice.actions
-export default CartSlice.reducer
+export const { addMyProducts, increaseQty, decreaseQty, removeCartItem } = MyProductSlice.actions
+export default MyProductSlice.reducer
