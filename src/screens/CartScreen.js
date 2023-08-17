@@ -1,6 +1,6 @@
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux';
-import { addProductToMyCart, removeCartItem, subtrProductToMyCart } from './reduxToolkit/CartSlice';
+import { addProductToMyCart, deleteMyCartItem, subtrProductToMyCart } from './reduxToolkit/CartSlice';
 import { decreaseQty, increaseQty } from './reduxToolkit/MyProductSlice';
 
 
@@ -50,7 +50,7 @@ const CartScreen = ({ navigation }) => {
                                                     dispatch(subtrProductToMyCart(item))
                                                     dispatch(decreaseQty(item.id))
                                                 } else {
-                                                    dispatch(removeCartItem(item.id))
+                                                    dispatch(deleteMyCartItem(item.id))
                                                     dispatch(decreaseQty(item.id))
                                                 }
                                             }}

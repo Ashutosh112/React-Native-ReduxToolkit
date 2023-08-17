@@ -33,9 +33,7 @@ const MyProductSlice = createSlice({
                 state[myIndex].qty = state[myIndex].qty - 1;
             }
         },
-        removeCartItem(state, action) {
-            return state.filter((item, index) => item.id !== action.payload);
-        }
+
     }
 })
 

@@ -1,7 +1,7 @@
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux';
-import { addProductToMyCart, subtrProductToMyCart } from './reduxToolkit/CartSlice';
-import { decreaseQty, increaseQty, removeCartItem } from './reduxToolkit/MyProductSlice';
+import { addProductToMyCart, deleteMyCartItem, removeCartItem } from './reduxToolkit/CartSlice';
+import { decreaseQty, increaseQty } from './reduxToolkit/MyProductSlice';
 
 
 const HomeScreen = ({ navigation }) => {
@@ -59,9 +59,10 @@ const HomeScreen = ({ navigation }) => {
                                         {item.qty == 0 ? null :
                                             <TouchableOpacity onPress={() => {
                                                 if (item.qty > 1) {
-                                                    dispatch(subtrProductToMyCart(item))
+                                                    dispatch(deleteMyCartItem(item))
                                                     dispatch(decreaseQty(item.id))
                                                 } else {
+                                                    dispatch(deleteMyCartItem(item.id))
                                                     dispatch(decreaseQty(item.id))
                                                 }
                                             }} style={styles.loginButton}>
